@@ -251,11 +251,9 @@ const messages = {
       transferTicketModal: {
         title: "Transferir Conversa",
         fieldLabel: "Digite para buscar usuários",
-        fieldUserLabel: "Transferir para usuário",
-        fieldUserPlaceholder: "Selecione um usuário",
         fieldQueueLabel: "Transferir para fila",
+        fieldConnectionLabel: "Transferir para conexão",
         fieldQueuePlaceholder: "Selecione uma fila",
-        fieldConnectionLabel: "Transferir para conexão",        
         fieldConnectionPlaceholder: "Selecione uma conexão",
         fieldQueuePlaceholder: "Selecione uma fila",
         noOptions: "Nenhum usuário encontrado com esse nome",
@@ -296,11 +294,6 @@ const messages = {
           settings: "Configurações",
         },
         appBar: {
-          config: {
-            title: "Sua Logo Marca.: WhaTicket Central de Multi Atendimento via WhatsApp",
-            copyright: "Sua Empresa",
-            pagecopyright: "https://seudominio.com.br",
-          },              
           user: {
             profile: "Perfil",
             logout: "Sair",
@@ -442,7 +435,6 @@ const messages = {
       ticketOptionsMenu: {
         delete: "Deletar",
         transfer: "Transferir",
-        resolveWithNoFarewell: "Finalizar sem despedida",
         confirmationModal: {
           title: "Deletar a conversa do contato",
           message:

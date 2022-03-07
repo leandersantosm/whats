@@ -246,12 +246,9 @@ const messages = {
       },
       transferTicketModal: {
         title: "Transfer Ticket",
-        fieldUserLabel: "Transfer to user",
-        fieldUserPlaceholder: "Please select a user",
+        fieldLabel: "Type to search for users",
         fieldQueueLabel: "Transfer to queue",
         fieldQueuePlaceholder: "Please select a queue",
-        fieldConnectionLabel: "Transfer to connection",
-        fieldConnectionPlaceholder: "Please select a connection",
         noOptions: "No user found with this name",
         buttons: {
           ok: "Transfer",
@@ -289,11 +286,6 @@ const messages = {
           settings: "Settings",
         },
         appBar: {
-          config: {
-            title: "Sua Logo Marca.: WhaTicket Central de Multi Atendimento via WhatsApp",
-            copyright: "Sua Empresa",
-            pagecopyright: "https://seudominio.com.br",
-          },                
           user: {
             profile: "Profile",
             logout: "Logout",
@@ -401,7 +393,6 @@ const messages = {
       ticketOptionsMenu: {
         delete: "Delete",
         transfer: "Transfer",
-        resolveWithNoFarewell: "Finalizar sem despedida",
         confirmationModal: {
           title: "Delete ticket #",
           titleFrom: "from contact ",
