@@ -25,8 +25,6 @@ import { AuthContext } from "../context/Auth/AuthContext";
 import BackdropLoading from "../components/BackdropLoading";
 import { i18n } from "../translate/i18n";
 
-import logobarra from "../assets/logopreto.png";
-
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -37,17 +35,7 @@ const useStyles = makeStyles((theme) => ({
       height: "calc(100vh - 56px)",
     },
   },
-  avatar: {
-    width: "100%",
-  },
-  logo: {
-    width: "70%",
-    height: "auto",
-    [theme.breakpoints.down("sm")]: {
-      width: "auto",
-      height: "100%",
-    },
-  },
+
   toolbar: {
     paddingRight: 20, // keep right padding when drawer closed
   },
@@ -189,7 +177,6 @@ const LoggedInLayout = ({ children }) => {
         open={drawerOpen}
       >
         <div className={classes.toolbarIcon}>
-        <img src={logobarra} className={classes.logo} alt="logobarra" />
           <IconButton onClick={() => setDrawerOpen(!drawerOpen)}>
             <ChevronLeftIcon />
           </IconButton>
@@ -230,7 +217,7 @@ const LoggedInLayout = ({ children }) => {
             noWrap
             className={classes.title}
           >
-            {i18n.t("mainDrawer.appBar.config.title")}
+            Whatsapp
           </Typography>
           {user.id && <NotificationsPopOver />}
 

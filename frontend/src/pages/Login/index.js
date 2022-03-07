@@ -6,6 +6,7 @@ import {
   Button,
   CssBaseline,
   TextField,
+  Grid,
   Box,
   Typography,
   Container,
@@ -22,24 +23,18 @@ import { i18n } from "../../translate/i18n";
 
 import { AuthContext } from "../../context/Auth/AuthContext";
 
-import logoImg from "../../assets/logopreto.png";
-
-const Copyright = () => {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {"Copyright © "}
-      <Link
-        color="inherit"
-        href={i18n.t("mainDrawer.appBar.config.pagecopyright")}
-        target="_blank"
-      >
-        {i18n.t("mainDrawer.appBar.config.copyright")}
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-};
+// const Copyright = () => {
+// 	return (
+// 		<Typography variant="body2" color="textSecondary" align="center">
+// 			{"Copyleft "}
+// 			<Link color="inherit" href="https://github.com/canove">
+// 				Canove
+// 			</Link>{" "}
+// 			{new Date().getFullYear()}
+// 			{"."}
+// 		</Typography>
+// 	);
+// };
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -82,9 +77,13 @@ const Login = () => {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
+        <Avatar className={classes.avatar}>
+          <LockOutlined />
+        </Avatar>
+        <Typography component="h1" variant="h5">
+          {i18n.t("login.title")}
+        </Typography>
         <form className={classes.form} noValidate onSubmit={handlSubmit}>
-          <img src={logoImg} style={{ width: "100%" }} alt="Logo" />
-        
           <TextField
             variant="outlined"
             margin="normal"
@@ -132,9 +131,21 @@ const Login = () => {
           >
             {i18n.t("login.buttons.submit")}
           </Button>
+          <Grid container>
+            <Grid item>
+              <Link
+                href="#"
+                variant="body2"
+                component={RouterLink}
+                to="/signup"
+              >
+                {i18n.t("login.buttons.register")}
+              </Link>
+            </Grid>
+          </Grid>
         </form>
       </div>
-      <Box mt={2}> <Copyright /> </Box>
+      <Box mt={8}>{/* <Copyright /> */}</Box>
     </Container>
   );
 };

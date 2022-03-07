@@ -1,28 +1,28 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 
-import {
-	Button,
-	Dialog,
-	Select,
-	FormControl,
-	InputLabel,
-	MenuItem,
-	DialogActions,
-	DialogContent,
-	DialogTitle,
-} from "@material-ui/core";
-
+import Button from "@material-ui/core/Button";
+import TextField from "@material-ui/core/TextField";
+import Dialog from "@material-ui/core/Dialog";
+import Select from "@material-ui/core/Select";
+import FormControl from "@material-ui/core/FormControl";
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
 import { makeStyles } from "@material-ui/core";
+
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import Autocomplete, {
+	createFilterOptions,
+} from "@material-ui/lab/Autocomplete";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import ButtonWithSpinner from "../ButtonWithSpinner";
 import toastError from "../../errors/toastError";
 import useQueues from "../../hooks/useQueues";
-import useWhatsApps from "../../hooks/useWhatsApps";
-import { AuthContext } from "../../context/Auth/AuthContext";
-import { Can } from "../Can";
 
 const useStyles = makeStyles((theme) => ({
   maxWidth: {
@@ -30,30 +30,21 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const TransferTicketModal = ({ modalOpen, onClose, ticketid,  ticketWhatsappId }) => {
+const filterOptions = createFilterOptions({
+	trim: true,
+});
+
+const TransferTicketModal = ({ modalOpen, onClose, ticketid }) => {
 	const history = useHistory();
+	const [options, setOptions] = useState([]);
 	const [queues, setQueues] = useState([]);
 	const [allQueues, setAllQueues] = useState([]);
 	const [loading, setLoading] = useState(false);
+	const [searchParam, setSearchParam] = useState("");
 	const [selectedUser, setSelectedUser] = useState(null);
 	const [selectedQueue, setSelectedQueue] = useState('');
-	const [selectedWhatsapp, setSelectedWhatsapp] = useState(ticketWhatsappId);
 	const classes = useStyles();
 	const { findAll: findAllQueues } = useQueues();
-	const [users, setUsers] = useState([]);
-	const { loadingWhatsapps, whatsApps } = useWhatsApps();
-	const { user: loggedInUser } = useContext(AuthContext);
-
-	useEffect(() => {
-		(async () => {
-			try {
-				const { data } = await api.get("/users/");
-				setUsers(data.users);
-			} catch (err) {
-				toastError(err);
-			}
-		})();
-	}, []);
 
 	useEffect(() => {
 		const loadQueues = async () => {
@@ -65,11 +56,35 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid,  ticketWhatsappId }
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
+	useEffect(() => {
+		if (!modalOpen || searchParam.length < 3) {
+			setLoading(false);
+			return;
+		}
+		setLoading(true);
+		const delayDebounceFn = setTimeout(() => {
+			const fetchUsers = async () => {
+				try {
+					const { data } = await api.get("/users/", {
+						params: { searchParam },
+					});
+					setOptions(data.users);
+					setLoading(false);
+				} catch (err) {
+					setLoading(false);
+					toastError(err);
+				}
+			};
+
+			fetchUsers();
+		}, 500);
+		return () => clearTimeout(delayDebounceFn);
+	}, [searchParam, modalOpen]);
+
 	const handleClose = () => {
 		onClose();
-		setSelectedQueue(null);
+		setSearchParam("");
 		setSelectedUser(null);
-		setSelectedWhatsapp(null);
 	};
 
 	const handleSaveTicket = async e => {
@@ -78,27 +93,22 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid,  ticketWhatsappId }
 		setLoading(true);
 		try {
 			let data = {};
-			if (selectedUser && selectedUser !== null) {
-				data.userId = selectedUser
-				data.status = 'pending';
-				data.queueId = null;
-				data.transf = true;
 
+			if (selectedUser) {
+				data.userId = selectedUser.id
 			}
+
 			if (selectedQueue && selectedQueue !== null) {
 				data.queueId = selectedQueue
+
 				if (!selectedUser) {
 					data.status = 'pending';
 					data.userId = null;
-					data.transf = true;
 				}
 			}
 
-			if(selectedWhatsapp) {
-				data.whatsappId = selectedWhatsapp;
-			}
-
 			await api.put(`/tickets/${ticketid}`, data);
+
 			setLoading(false);
 			history.push(`/tickets`);
 		} catch (err) {
@@ -114,22 +124,47 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid,  ticketWhatsappId }
 					{i18n.t("transferTicketModal.title")}
 				</DialogTitle>
 				<DialogContent dividers>
-				<FormControl variant="outlined" margin="dense" className={classes.maxWidth} style={{ marginTop: 20 }}>
-						<InputLabel>
-							{i18n.t("transferTicketModal.fieldUserLabel")}
-						</InputLabel>
-						  <Select
-							value={selectedUser}
-							onChange={(e) => setSelectedUser(e.target.value)}
-							label={i18n.t("transferTicketModal.fieldUserPlaceholder")}
-							>
-							<MenuItem value={''}>&nbsp;</MenuItem>
-							{users.map(user => (
-								<MenuItem value={user.id}>{user.name}</MenuItem>
-							))}
-						</Select>
-					</FormControl>
-					<FormControl variant="outlined" margin="dense" className={classes.maxWidth}  style={{ marginTop: 20 }}>
+					<Autocomplete
+						style={{ width: 300, marginBottom: 20 }}
+						getOptionLabel={option => `${option.name}`}
+						onChange={(e, newValue) => {
+							setSelectedUser(newValue);
+							if (newValue != null && Array.isArray(newValue.queues)) {
+								setQueues(newValue.queues);
+							} else {
+								setQueues(allQueues);
+								setSelectedQueue('');
+							}
+						}}
+						options={options}
+						filterOptions={filterOptions}
+						freeSolo
+						autoHighlight
+						noOptionsText={i18n.t("transferTicketModal.noOptions")}
+						loading={loading}
+						renderInput={params => (
+							<TextField
+								{...params}
+								label={i18n.t("transferTicketModal.fieldLabel")}
+								variant="outlined"
+								required
+								autoFocus
+								onChange={e => setSearchParam(e.target.value)}
+								InputProps={{
+									...params.InputProps,
+									endAdornment: (
+										<React.Fragment>
+											{loading ? (
+												<CircularProgress color="inherit" size={20} />
+											) : null}
+											{params.InputProps.endAdornment}
+										</React.Fragment>
+									),
+								}}
+							/>
+						)}
+					/>
+					<FormControl variant="outlined" className={classes.maxWidth}>
 						<InputLabel>{i18n.t("transferTicketModal.fieldQueueLabel")}</InputLabel>
 						<Select
 							value={selectedQueue}
@@ -142,25 +177,6 @@ const TransferTicketModal = ({ modalOpen, onClose, ticketid,  ticketWhatsappId }
 							))}
 						</Select>
 					</FormControl>
-					<Can
-						role={loggedInUser.profile}
-						perform="ticket-options:transferWhatsapp"
-						yes={() => (!loadingWhatsapps && 
-							<FormControl variant="outlined" margin="dense" className={classes.maxWidth} style={{ marginTop: 20 }}>
-								<InputLabel>{i18n.t("transferTicketModal.fieldConnectionLabel")}</InputLabel>
-								<Select
-									value={selectedWhatsapp}
-									onChange={(e) => setSelectedWhatsapp(e.target.value)}
-									label={i18n.t("transferTicketModal.fieldConnectionPlaceholder")}
-								>
-									<MenuItem value={''}>&nbsp;</MenuItem>
-									{whatsApps.map((whasapp) => (
-										<MenuItem key={whasapp.id} value={whasapp.id}>{whasapp.name}</MenuItem>
-									))}
-								</Select>
-							</FormControl>
-						)}
-					/>
 				</DialogContent>
 				<DialogActions>
 					<Button
