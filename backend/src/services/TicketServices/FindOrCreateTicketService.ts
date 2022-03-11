@@ -1,175 +1,81 @@
-import React, { useState, useEffect } from "react";
-import openSocket from "socket.io-client";
+import { subHours } from "date-fns";
+import { Op } from "sequelize";
+import Contact from "../../models/Contact";
+import Ticket from "../../models/Ticket";
+import ShowTicketService from "./ShowTicketService";
 
-import { makeStyles } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
-import Typography from "@material-ui/core/Typography";
-import Container from "@material-ui/core/Container";
-import Select from "@material-ui/core/Select";
-import { toast } from "react-toastify";
-import Tooltip from "@material-ui/core/Tooltip";
+const FindOrCreateTicketService = async (
+  contact: Contact,
+  whatsappId: number,
+  unreadMessages: number,
+  groupContact?: Contact
+): Promise<Ticket> => {
+  let ticket = await Ticket.findOne({
+    where: {
+      status: {
+        [Op.or]: ["open", "pending"]
+      },
+      contactId: groupContact ? groupContact.id : contact.id,
+      whatsappId: whatsappId
+    }
+  });
 
-import api from "../../services/api";
-import { i18n } from "../../translate/i18n.js";
-import toastError from "../../errors/toastError";
+  if (ticket) {
+    await ticket.update({ unreadMessages });
+  }
 
-const useStyles = makeStyles(theme => ({
-	root: {
-		display: "flex",
-		alignItems: "center",
-		padding: theme.spacing(4),
-	},
+  if (!ticket && groupContact) {
+    ticket = await Ticket.findOne({
+      where: {
+        contactId: groupContact.id,
+        whatsappId: whatsappId
+      },
+      order: [["updatedAt", "DESC"]]
+    });
 
-	paper: {
-		padding: theme.spacing(2),
-		display: "flex",
-		alignItems: "center",
-	},
+    if (ticket) {
+      await ticket.update({
+        status: "pending",
+        userId: null,
+        unreadMessages
+      });
+    }
+  }
 
-	settingOption: {
-		marginLeft: "auto",
-	},
-	margin: {
-		margin: theme.spacing(1),
-	},
-}));
+  if (!ticket && !groupContact) {
+    ticket = await Ticket.findOne({
+      where: {
+        updatedAt: {
+          [Op.between]: [+subHours(new Date(), 2), +new Date()]
+        },
+        contactId: contact.id,
+        whatsappId: whatsappId
+      },
+      order: [["updatedAt", "DESC"]]
+    });
 
-const Settings = () => {
-	const classes = useStyles();
+    if (ticket) {
+      await ticket.update({
+        status: "pending",
+        userId: null,
+        unreadMessages
+      });
+    }
+  }
 
-	const [settings, setSettings] = useState([]);
+  if (!ticket) {
+    ticket = await Ticket.create({
+      contactId: groupContact ? groupContact.id : contact.id,
+      status: "pending",
+      isGroup: !!groupContact,
+      unreadMessages,
+      whatsappId
+    });
+  }
 
-	useEffect(() => {
-		const fetchSession = async () => {
-			try {
-				const { data } = await api.get("/settings");
-				setSettings(data);
-			} catch (err) {
-				toastError(err);
-			}
-		};
-		fetchSession();
-	}, []);
+  ticket = await ShowTicketService(ticket.id);
 
-	useEffect(() => {
-		const socket = openSocket(process.env.REACT_APP_BACKEND_URL);
-
-		socket.on("settings", data => {
-			if (data.action === "update") {
-				setSettings(prevState => {
-					const aux = [...prevState];
-					const settingIndex = aux.findIndex(s => s.key === data.setting.key);
-					aux[settingIndex].value = data.setting.value;
-					return aux;
-				});
-			}
-		});
-
-		return () => {
-			socket.disconnect();
-		};
-	}, []);
-
-	const handleChangeSetting = async e => {
-		const selectedValue = e.target.value;
-		const settingKey = e.target.name;
-
-		try {
-			await api.put(`/settings/${settingKey}`, {
-				value: selectedValue,
-			});
-			toast.success(i18n.t("settings.success"));
-		} catch (err) {
-			toastError(err);
-		}
-	};
-
-	const getSettingValue = key => {
-		const { value } = settings.find(s => s.key === key);
-		return value;
-	};
-
-	return (
-		<div className={classes.root}>
-			<Container className={classes.container} maxWidth="sm">
-				<Typography variant="body2" gutterBottom>
-					{i18n.t("settings.title")}
-				</Typography>
-				<Paper className={classes.paper}>
-					<Typography variant="body1">
-						{i18n.t("settings.settings.userCreation.name")}
-					</Typography>
-					<Select
-						margin="dense"
-						variant="outlined"
-						native
-						id="userCreation-setting"
-						name="userCreation"
-						value={
-							settings && settings.length > 0 && getSettingValue("userCreation")
-						}
-						className={classes.settingOption}
-						onChange={handleChangeSetting}
-					>
-						<option value="enabled">
-							{i18n.t("settings.settings.userCreation.options.enabled")}
-						</option>
-						<option value="disabled">
-							{i18n.t("settings.settings.userCreation.options.disabled")}
-						</option>
-					</Select>
-				</Paper>
-				<Typography variant="body2" gutterBottom></Typography>
-				<Tooltip title={i18n.t("settings.settings.timeCreateNewTicket.note")}>
-					<Paper className={classes.paper} elevation={3}>
-						<Typography variant="body1">
-							{i18n.t("settings.settings.timeCreateNewTicket.name")}
-						</Typography>
-						<Select
-							margin="dense"
-							variant="outlined"
-							native
-							id="timeCreateNewTicket-setting"
-							name="timeCreateNewTicket"
-							value={
-								settings && settings.length > 0 && getSettingValue("timeCreateNewTicket")
-							}
-							className={classes.settingOption}
-							onChange={handleChangeSetting}
-						>
-							<option value="10">
-								{i18n.t("settings.settings.timeCreateNewTicket.options.10")}
-							</option>
-							<option value="30">
-								{i18n.t("settings.settings.timeCreateNewTicket.options.30")}
-							</option>
-							<option value="60">
-								{i18n.t("settings.settings.timeCreateNewTicket.options.60")}
-							</option>
-							<option value="300">
-								{i18n.t("settings.settings.timeCreateNewTicket.options.300")}
-							</option>
-							<option value="1800">
-								{i18n.t("settings.settings.timeCreateNewTicket.options.1800")}
-							</option>
-							<option value="3600">
-								{i18n.t("settings.settings.timeCreateNewTicket.options.3600")}
-							</option>
-							<option value="7200">
-								{i18n.t("settings.settings.timeCreateNewTicket.options.7200")}
-							</option>
-							<option value="21600">
-								{i18n.t("settings.settings.timeCreateNewTicket.options.21600")}
-							</option>
-							<option value="43200">
-								{i18n.t("settings.settings.timeCreateNewTicket.options.43200")}
-							</option>
-						</Select>
-					</Paper>
-				</Tooltip>
-			</Container>
-		</div>
-	);
+  return ticket;
 };
 
-export default Settings;
+export default FindOrCreateTicketService;
