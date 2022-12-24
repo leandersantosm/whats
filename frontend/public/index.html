@@ -17,12 +17,13 @@
 			content="minimum-scale=1, initial-scale=1, width=device-width"
 		/>
 	</head>
-	<body style="margin:15px; background:#4598bf;">
+	<body style="margin:15px; background:#179788;">
 		<noscript>You need to enable JavaScript to run this app.</noscript>
 		<div id="root"></div>
 	</body>
 	<script>
 		var intervalo = setInterval(function(){
+			$('.MuiDivider-root').hide();
 			$('.MuiListItemIcon-root').css('color','#fff');
 			$('.MuiPaper-rounded').css('border-radius','0');
 			$('.MuiTypography-gutterBottom').css('margin-bottom',0).css('margin-left','10px').css('font-weight','bold');
