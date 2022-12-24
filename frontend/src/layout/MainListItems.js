@@ -96,7 +96,7 @@ const MainListItems = (props) => {
           <>
             <Divider />
             <ListSubheader inset>
-              {i18n.t("mainDrawer.listItems.administration")}
+              
             </ListSubheader>
             <ListItemLink
         to="/"
