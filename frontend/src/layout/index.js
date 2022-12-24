@@ -30,7 +30,7 @@ const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
-    height: "100vh",
+    height: "calc(100vh - 30px)",
     [theme.breakpoints.down("sm")]: {
       height: "calc(100vh - 56px)",
     },
