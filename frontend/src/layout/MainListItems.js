@@ -96,7 +96,7 @@ const MainListItems = (props) => {
           <>
             <Divider />
             <ListSubheader inset>
-              
+              &nbsp;
             </ListSubheader>
             <ListItemLink
         to="/"
