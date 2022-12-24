@@ -22,15 +22,10 @@
 		<div id="root"></div>
 	</body>
 	<script>
-		var i = 0;
 		var intervalo = setInterval(function(){
 			$('.MuiListItemIcon-root').css('color','#fff');
 			$('.MuiPaper-rounded').css('border-radius','0');
 			$('.MuiTypography-gutterBottom').css('margin-bottom',0).css('margin-left','10px').css('font-weight','bold');
-			i += 1;
-			if(i >= 1000){
-				clearInterval(intervalo);
-			}
 		},10);
 	</script>
 </html>
