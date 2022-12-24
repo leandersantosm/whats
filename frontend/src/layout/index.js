@@ -76,6 +76,8 @@ const useStyles = makeStyles((theme) => ({
     position: "relative",
     whiteSpace: "nowrap",
     width: drawerWidth,
+    background: {process.env.NODE_ENV === "development" ? "inherit" : "primary"},
+    borderRadius: "0 0 0 10px",
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -108,6 +110,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     overflow: "auto",
     flexDirection: "column",
+    borderRadius: "0 0 10px 0",
   },
 }));
 
