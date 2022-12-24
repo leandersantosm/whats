@@ -24,7 +24,7 @@ const messages = {
           password: "Senha",
         },
         buttons: {
-          submit: "Entrar no Sistema",
+          submit: "Entrar Agora",
           register: "Não tem um conta? Cadastre-se!",
         },
       },
