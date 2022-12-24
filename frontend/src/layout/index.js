@@ -54,6 +54,7 @@ const useStyles = makeStyles((theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
+    boxShadow: "none !important",
   },
   appBarShift: {
     marginLeft: drawerWidth,
