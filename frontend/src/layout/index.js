@@ -79,7 +79,6 @@ const useStyles = makeStyles((theme) => ({
     width: drawerWidth,
     background: "#4598bf",
     color: "#fff",
-    borderRadius: "0 0 0 10px",
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -102,6 +101,7 @@ const useStyles = makeStyles((theme) => ({
   content: {
     flex: 1,
     overflow: "auto",
+    borderRadius: "0 0 10px 10px",
   },
   container: {
     paddingTop: theme.spacing(4),
@@ -112,7 +112,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     overflow: "auto",
     flexDirection: "column",
-    borderRadius: "0 0 10px 0",
+    borderRadius: "15px",
   },
 }));
 
