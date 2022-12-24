@@ -77,7 +77,7 @@ const useStyles = makeStyles((theme) => ({
     position: "relative",
     whiteSpace: "nowrap",
     width: drawerWidth,
-    background: "#4598bf",
+    background: "#179788",
     color: "#fff",
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
