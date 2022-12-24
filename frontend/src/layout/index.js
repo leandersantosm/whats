@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     justifyContent: "flex-end",
     padding: "0 8px",
-    minHeight: "48px",
+    minHeight: "60px",
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 0,
