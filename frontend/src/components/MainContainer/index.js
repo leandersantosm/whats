@@ -17,6 +17,7 @@ const useStyles = makeStyles((theme) => ({
     overflowY: "hidden",
     display: "flex",
     flexDirection: "column",
+    borderRadius: "20px",
   },
 }));
 
