@@ -48,9 +48,8 @@ const useStyles = makeStyles((theme) => ({
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
-    marginTop: 15,
-    marginRight: 15,
-    borderRadius: "0 10px 0 0",
+    margin: "15px 15px 0 15px",
+    borderRadius: "0 10px 10px 0",
     transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
