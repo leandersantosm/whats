@@ -35,7 +35,7 @@ function ListItemLink(props) {
   return (
     <li>
       <ListItem button component={renderLink} className={className}>
-        {icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
+        {icon ? <ListItemIcon color="#fff">{icon}</ListItemIcon> : null}
         <ListItemText primary={primary} />
       </ListItem>
     </li>
