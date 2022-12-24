@@ -76,7 +76,8 @@ const useStyles = makeStyles((theme) => ({
     position: "relative",
     whiteSpace: "nowrap",
     width: drawerWidth,
-    background: {process.env.NODE_ENV === "development" ? "inherit" : "primary"},
+    background: "#4598bf",
+    color: "#fff",
     borderRadius: "0 0 0 10px",
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
