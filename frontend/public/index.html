@@ -22,8 +22,13 @@
 		<div id="root"></div>
 	</body>
 	<script>
-		setInterval(function(){
+		var i = 0;
+		var intervalo = setInterval(function(){
 			$('.MuiListItemIcon-root').css('color','#fff');
-		},1000);
+			i += 1;
+			if(i >= 1000){
+				clearInterval(intervalo);
+			}
+		},10);
 	</script>
 </html>
